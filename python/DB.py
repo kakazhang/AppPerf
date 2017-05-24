@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+import os
 import sys
 import MySQLdb
 import traceback
@@ -9,6 +10,10 @@ from optparse import OptionParser
 
 DB_NAME="DB_APPPERF"
 TABLE_NAME="TABLE_APPPERF"
+
+PKG_IQIYI="com.qiyi.video"
+PKG_TENCENT="com.tencent.qqlive"
+PKG_YOUKU="com.youku.phone"
 
 def checkTableExists(conn, tablename):
     cursor = conn.cursor()
@@ -109,6 +114,19 @@ def queryTime(package, action) :
     # 关闭数据库连接
     db.close()
 
+def getBuildVersion(package) :
+    if package == PKG_IQIYI :
+        prefix = "iqiyi"
+    elif package == PKG_TENCENT :
+        prefix = "qqlive"
+    else :
+        prefix = "youku"
+
+    files = os.listdir("./apk")
+    for file in files :
+        if not os.path.isdir(file) and file.find(prefix) != -1 :
+            return file
+
 def main() :
     # init options
     parser = OptionParser("usage: %prog [options]")
@@ -123,15 +141,16 @@ def main() :
     action=options.action if options.action else "startup"
     times=options.times if options.times else 0
     version=options.version if options.version else "8.4.0"
-    buildversion=options.buildversion if options.buildversion else "none"
-    
+    buildversion=options.buildversion if options.buildversion else getBuildVersion(pkg)
+
+    #try to create DB
     createDB()
 
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 
-    if times == "none" :
+    if times == "None" :
         times = 0
-
+    
     saveTime(pkg, action, times, version, timestamp,buildversion)
 
 #queryTime(pkg, action)

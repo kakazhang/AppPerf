@@ -15,13 +15,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from optparse import OptionParser
 import os
-import re
 import sys
 import time
+import logging
 import subprocess
 import ConfigParser
-import threading
-import ctypes
+#from apscheduler.schedulers.blocking  import BlockingScheduler
 
 PKG_QIYI="com.qiyi.video"
 PKG_TENCENT="com.tencent.qqlive"
@@ -29,26 +28,60 @@ PKG_YOUKU="com.youku.phone"
 
 ACTION_STARTUP="startup"
 ACTION_PLAY="play"
+LOOP_COUNT=1
+
 # ######################################################################################
-# main
+# download from server
 #
+def downloadApk() :
+    if os.path.isdir("apk") :
+        os.system("rm -r ./apk/iqiyi-*.apk")
+
+    #start download
+    os.system("python apk_downloader.py")
+
+# ######################################################################################
+# download from server
+#
+def installApk() :
+   files = os.listdir("./apk")
+   for file in files :
+       print("install :%s" %(file))
+       os.system("adb install -r apk/%s" %(file))
+
+def appPerf() :
+    COUNT=5
+    package=PKG_QIYI
+        
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_STARTUP,COUNT))
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_PLAY,COUNT))
+                
+    package=PKG_TENCENT
+                    
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_STARTUP,COUNT))
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_PLAY,COUNT))
+                            
+    package=PKG_YOUKU
+                                
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_STARTUP,COUNT))
+    os.system("python AppPerf.py -p %s -a %s -n %d" %(package, ACTION_PLAY,COUNT))
+
+# ######################################################################################
+# doAppPerf function
+#
+def doAppPerf() :
+    #downloadApk()
+    #installApk()
+    
+    for i in range(long(LOOP_COUNT)) :
+         appPerf()
+
+#end of doAppPerf
+
 def main():
-   package=PKG_QIYI
+    doAppPerf();
 
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_STARTUP))
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_PLAY))
-
-   package=PKG_TENCENT
-
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_STARTUP))
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_PLAY))
-
-   package=PKG_YOUKU
-
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_STARTUP))
-   os.system("python AppPerf.py -p %s -a %s" %(package, ACTION_PLAY))
-
-   return 0
+    return 0
    
 # python entry
 if __name__ == "__main__":
