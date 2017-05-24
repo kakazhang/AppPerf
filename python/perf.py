@@ -28,8 +28,9 @@ def createSQL() :
         PKG_NAME CHAR(20) NOT NULL,
         ACTION CHAR(20),
         COST FLOAT,
-        VERSION FLOAT,
-        TIMESTAMP CHAR(36))"""
+        VERSION CHAR(20),
+        TIMESTAMP CHAR(36),
+        BUILDNAME CHAR(36))"""
 
     cursor.execute("DROP TABLE IF EXISTS TABLE_APPPERF")
     
@@ -73,9 +74,8 @@ def queryTime() :
     # prepare a cursor object using cursor() method
     cursor = db.cursor()    
 
-    #sql = "SELECT * FROM %s" %(TABLE_NAME)
-    #sql="SELECT * FROM TABLE_APPPERF WHERE DATE_FORMAT(timestamp,‘%Y-%m-%d‘)>=‘2017-05-17‘ AND DATE_FORMAT(timestamp,‘%Y-%m-%d‘)<=‘2017-05-17‘ AND DATE_FORMAT(timestamp,‘%H‘)>=10 AND DATE_FORMAT(timestamp,‘%H‘)<=11"
-    sql="select * from TABLE_APPPERF where timestamp>='2017-05-17 10:00:00' and timestamp<'2017-05-17 11:00:00'"
+    sql="select * from TABLE_APPPERF where timestamp>='2017-05-23 18:00:00' and timestamp<'2017-05-23 20:00:00'"
+#sql="select * from TABLE_APPPERF"
     try:
 	# 执行SQL语句
 	cursor.execute(sql)
@@ -88,7 +88,7 @@ def queryTime() :
                 version=row[3]
                 timestamp=row[4]
 		# 打印结果
-		print "pkg=%s,action=%s,cost=%f,version=%f,timestamp=%s" %(pkg, action, cost,version,timestamp)
+		print "pkg=%s,action=%s,cost=%f,version=%s,timestamp=%s" %(pkg, action, cost,version,timestamp)
 
     except Exception, e:
 	exstr = traceback.format_exc()
@@ -101,7 +101,7 @@ def drop_db() :
     conn = MySQLdb.connect("localhost", "root", "111111")
 
     cursor=conn.cursor()
-    cursor.execute("DROP DATABASE IF EXISTS %s" %(DB_APPPERF))
+    cursor.execute("DROP DATABASE IF EXISTS %s" %(DB_NAME))
 
 def main() :
     # init options

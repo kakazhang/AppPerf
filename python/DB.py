@@ -39,8 +39,9 @@ def createDB():
         PKG_NAME CHAR(20) NOT NULL,
         ACTION CHAR(20),
         COST FLOAT,
-        VERSION FLOAT,
-        TIMESTAMP CHAR(36)
+        VERSION CHAR(20),
+        TIMESTAMP CHAR(36),
+        BUILDNAME CHAR(36)
     )"""
     
     #cursor.execute("DROP TABLE IF EXISTS %s" %TABLE_NAME)
@@ -54,17 +55,17 @@ def createDB():
 # #####################################################################################
 #  save app time
 # ####
-def saveTime(package, action, cost, version, timestamp) :
+def saveTime(package, action, cost, version, timestamp,buildversion) :
     db = MySQLdb.connect(host="localhost", user="root", passwd="111111", db=DB_NAME)
     
     # prepare a cursor object using cursor() method
     cursor = db.cursor()
-    value=[package,action,float(cost),float(version), timestamp]
+    value=[package,action,float(cost),version, timestamp,buildversion]
 
     try:
         # Execute the SQL command
         # Commit your changes in the database
-        cursor.execute("insert into TABLE_APPPERF values(%s,%s,%s,%s,%s)",value)
+        cursor.execute("insert into TABLE_APPPERF values(%s,%s,%s,%s,%s,%s)",value)
         db.commit()
 
     except Exception, e:
@@ -99,7 +100,7 @@ def queryTime(package, action) :
                 version=row[3]
                 timestamp=row[4]
 		# 打印结果
-		print "pkg=%s,action=%s,cost=%f,version=%f,timestamp=%s" %(pkg, action, cost,version,timestamp)
+		print "pkg=%s,action=%s,cost=%f,version=%s,timestamp=%s" %(pkg, action, cost,version,timestamp)
 
     except Exception, e:
 	exstr = traceback.format_exc()
@@ -121,7 +122,8 @@ def main() :
     pkg=options.package if options.package else "com.qiyi.video"
     action=options.action if options.action else "startup"
     times=options.times if options.times else 0
-    version=options.version if options.version else 1.0
+    version=options.version if options.version else "8.4.0"
+    buildversion=options.buildversion if options.buildversion else "none"
     
     createDB()
 
@@ -130,9 +132,9 @@ def main() :
     if times == "none" :
         times = 0
 
-    saveTime(pkg, action, times, version, timestamp)
+    saveTime(pkg, action, times, version, timestamp,buildversion)
 
-    queryTime(pkg, action)
+#queryTime(pkg, action)
 
     return 0
 

@@ -85,7 +85,7 @@ def dohalfscreenPlay(package,source,timeout):
 
     # start it
     
-    subprocess.Popen("adb shell am instrument -w -r -e debug false -e packageName %s -e main_idle 10000 -e search_idle 2000 -e play_idle 5000 -e launch_timeout 5000 -e record_timeout 2000 -e nowaitid 1 -e class perf.android.com.appperf.Case.TestAppPlay perf.android.com.appperf.test/android.support.test.runner.AndroidJUnitRunner" %(package),
+    subprocess.Popen("adb shell am instrument -w -r -e debug false -e packageName %s -e main_idle 5000 -e search_idle 2000 -e play_idle 5000 -e launch_timeout 5000 -e record_timeout 2000 -e nowaitid 1 -e class perf.android.com.appperf.Case.TestAppPlay perf.android.com.appperf.test/android.support.test.runner.AndroidJUnitRunner" %(package),
        stdout = subprocess.PIPE, shell = True).communicate()
 
 # ######################################################################################
