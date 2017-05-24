@@ -54,6 +54,9 @@ public class UiHelper {
     public static boolean launchApp(String packageName) {
         boolean canBeLaunched = false;
 
+        if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") && launchForXiaomi(packageName))
+            return true;
+
         Intent intent = mPm.getLaunchIntentForPackage(packageName);
         if (intent != null) {
             canBeLaunched = true;
@@ -78,6 +81,28 @@ public class UiHelper {
         }
 
         return canBeLaunched;
+    }
+
+    public static boolean launchForXiaomi(String packageName) {
+        String cmd = null;
+        if (packageName.equals(Config.QIYI_PACKAGE_NAME))
+            cmd = "am start -n com.qiyi.video/.WelcomeActivity";
+        else if (packageName.equals(Config.TENCENT_PACKAGE_NAME))
+            cmd = "am start -n com.tencent.qqlive/.ona.activity.WelcomeActivity";
+        else if (packageName.equals(Config.YOUKU_PACKAGE_NAME))
+            cmd = "am start -n com.youku.phone/.ActivityWelcome";
+
+        if (cmd == null)
+            return false;
+
+        try {
+            mDevice.executeShellCommand(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        UiHelper.snap(Config.sLaunchTimeout);
+        return true;
     }
 
     public static boolean waitResourceGone(String packageName, String resId, long timeout) {
